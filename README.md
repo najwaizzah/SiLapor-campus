@@ -25,14 +25,12 @@ Aplikasi ini menyediakan dua peran pengguna, yaitu pelapor dan admin. Pelapor da
 ## Link Aplikasi
 
 Link Github (Source Code):
-
-https://github.com/USERNAME/lapor-campus
+https://github.com/najwaizzah/SiLapor-campus
 
 Link Publish Web:
+https://najwaizzah.github.io/SiLapor-campus/
 
-https://USERNAME.github.io/lapor-campus
-
----
+-----
 
 ## Skenario Pengujian Aplikasi
 

@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Sistem Pelaporan Kampus</title>
+
+    <style>
+      body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        margin: 0;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        min-height: 100vh;
+      }
+
+      .container {
+        width: 90%;
+        max-width: 1000px;
+        margin: 40px auto;
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      h2 {
+        text-align: center;
+      }
+
+      input,
+      textarea,
+      select {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+      }
+
+      button {
+        padding: 10px 15px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: #5563c1;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+      }
+
+      table,
+      th,
+      td {
+        border: 1px solid #ccc;
+      }
+
+      th,
+      td {
+        padding: 10px;
+        text-align: center;
+      }
+
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- LOGIN -->
+    <div class="container" id="loginPage">
+      <h2>Login Sistem Pelaporan</h2>
+
+      <input type="text" id="email" placeholder="Username / Email" />
+      <input type="password" id="password" placeholder="Password" />
+
+      <button onclick="login()">Login</button>
+    </div>
+
+    <!-- USER / PELAPOR -->
+    <div class="container hidden" id="userPage">
+      <h2>Dashboard Pelapor</h2>
+
+      <input type="text" id="nama" placeholder="Nama" />
+      <select id="judul">
+        <option value="">-- Pilih Jenis Laporan --</option>
+        <option value="Lampu Rusak">Lampu Rusak</option>
+        <option value="AC Rusak">AC Rusak</option>
+        <option value="Kursi Rusak">Kursi Rusak</option>
+        <option value="Proyektor Rusak">Proyektor Rusak</option>
+        <option value="Kebersihan">Kebersihan</option>
+        <option value="Keamanan">Keamanan</option>
+        <option value="Internet / WiFi">Internet / WiFi</option>
+        <option value="Lainnya">Lainnya</option>
+      </select>
+      <textarea id="deskripsi" placeholder="Deskripsi Laporan"></textarea>
+
+      <button onclick="kirimLaporan()">Kirim Laporan</button>
+
+      <h3>Daftar Laporan</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>Judul</th>
+            <th>Deskripsi</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="userTableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- ADMIN -->
+    <div class="container hidden" id="adminPage">
+      <h2>Dashboard Admin</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>Judul</th>
+            <th>Deskripsi</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="adminTableBody"></tbody>
+      </table>
+    </div>
+
+    <script>
+      function login() {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        if (email === "admin" && password === "admin") {
+          alert("Login Admin berhasil");
+          document.getElementById("loginPage").classList.add("hidden");
+          document.getElementById("adminPage").classList.remove("hidden");
+          loadAdminData();
+          return;
+        }
+
+        if (email !== "" && password !== "") {
+          alert("Login Pelapor berhasil");
+          document.getElementById("loginPage").classList.add("hidden");
+          document.getElementById("userPage").classList.remove("hidden");
+          loadUserData();
+          return;
+        }
+
+        alert("Email dan password harus diisi");
+      }
+
+      function kirimLaporan() {
+        const nama = document.getElementById("nama").value;
+        const judul = document.getElementById("judul").value;
+        const deskripsi = document.getElementById("deskripsi").value;
+
+        if (nama === "" || judul === "" || deskripsi === "") {
+          alert("Semua field harus diisi");
+          return;
+        }
+
+        let data = JSON.parse(localStorage.getItem("laporan")) || [];
+
+        let laporanBaru = {
+          nama: nama,
+          judul: judul,
+          deskripsi: deskripsi,
+          status: "Menunggu",
+        };
+
+        data.push(laporanBaru);
+
+        localStorage.setItem("laporan", JSON.stringify(data));
+
+        alert("Laporan berhasil dikirim");
+
+        document.getElementById("nama").value = "";
+        document.getElementById("judul").value = "";
+        document.getElementById("deskripsi").value = "";
+
+        loadUserData();
+      }
+
+      function loadUserData() {
+        const table = document.getElementById("userTableBody");
+        table.innerHTML = "";
+
+        let data = JSON.parse(localStorage.getItem("laporan")) || [];
+
+        data.forEach(function (item) {
+          let row = `
+            <tr>
+                <td>${item.nama}</td>
+                <td>${item.judul || "-"}</td>
+                <td>${item.deskripsi || "-"}</td>
+                <td>${item.status}</td>
+            </tr>
+        `;
+
+          table.innerHTML += row;
+        });
+      }
+
+      function loadAdminData() {
+        const table = document.getElementById("adminTableBody");
+        table.innerHTML = "";
+
+        let data = JSON.parse(localStorage.getItem("laporan")) || [];
+
+        data.forEach(function (item, index) {
+          let row = `
+            <tr>
+                <td>${item.nama}</td>
+                <td>${item.judul || "-"}</td>
+                <td>${item.deskripsi || "-"}</td>
+                <td>
+                    <select onchange="updateStatus(${index}, this.value)">
+                        <option value="Menunggu" ${item.status === "Menunggu" ? "selected" : ""}>Menunggu</option>
+                        <option value="Diproses" ${item.status === "Diproses" ? "selected" : ""}>Diproses</option>
+                        <option value="Selesai" ${item.status === "Selesai" ? "selected" : ""}>Selesai</option>
+                    </select>
+                </td>
+            </tr>
+        `;
+
+          table.innerHTML += row;
+        });
+      }
+
+      function updateStatus(index, statusBaru) {
+        let data = JSON.parse(localStorage.getItem("laporan")) || [];
+
+        if (data[index]) {
+          data[index].status = statusBaru;
+          localStorage.setItem("laporan", JSON.stringify(data));
+          alert("Status laporan berhasil diubah menjadi: " + statusBaru);
+          loadAdminData();
+        }
+      }
+    </script>
+  </body>
+</html>
